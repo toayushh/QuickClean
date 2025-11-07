@@ -56,30 +56,28 @@ async function getRAMUsage() {
 async function getDiskUsage() {
   try {
     if (os.platform() === 'win32') {
-      const { stdout } = await execAsync('wmic logicaldisk where "DeviceID=\'C:\'" get Size,FreeSpace /format:list', { timeout: 3000 });
+      // Use PowerShell for faster response
+      const { stdout } = await execAsync(
+        'powershell -Command "Get-PSDrive C | Select-Object Used,Free | ConvertTo-Json"',
+        { timeout: 2000 }
+      );
       
-      const lines = stdout.split('\n').filter(line => line.trim());
-      let freeSpace = 0;
-      let totalSpace = 0;
-      
-      lines.forEach(line => {
-        if (line.startsWith('FreeSpace=')) {
-          freeSpace = parseInt(line.split('=')[1]);
-        } else if (line.startsWith('Size=')) {
-          totalSpace = parseInt(line.split('=')[1]);
-        }
-      });
-      
-      if (totalSpace > 0) {
-        const used = totalSpace - freeSpace;
-        const usage = (used / totalSpace) * 100;
+      if (stdout.trim()) {
+        const diskInfo = JSON.parse(stdout);
+        const used = diskInfo.Used || 0;
+        const free = diskInfo.Free || 0;
+        const total = used + free;
         
-        return {
-          usage: Math.round(usage),
-          total: Math.round(totalSpace / (1024 * 1024 * 1024)),
-          used: Math.round(used / (1024 * 1024 * 1024)),
-          free: Math.round(freeSpace / (1024 * 1024 * 1024))
-        };
+        if (total > 0) {
+          const usage = (used / total) * 100;
+          
+          return {
+            usage: Math.round(usage),
+            total: Math.round(total / (1024 * 1024 * 1024)),
+            used: Math.round(used / (1024 * 1024 * 1024)),
+            free: Math.round(free / (1024 * 1024 * 1024))
+          };
+        }
       }
     }
   } catch (error) {

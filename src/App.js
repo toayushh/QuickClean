@@ -18,9 +18,9 @@ import DiskAnalyzer from './components/DiskAnalyzer';
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [settings, setSettings] = useState({
-    dryRun: true,
+    dryRun: false, // Production mode - real operations
     browserCleaning: true,
-    testMode: true,
+    testMode: false, // Real system data
     customFolders: []
   });
 

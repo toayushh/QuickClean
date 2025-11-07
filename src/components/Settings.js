@@ -25,9 +25,9 @@ function Settings({ settings, saveSettings }) {
   const handleReset = () => {
     setIsResetting(true);
     const defaultSettings = {
-      dryRun: true,
+      dryRun: false, // Changed to false for production use
       browserCleaning: true,
-      testMode: true,
+      testMode: false, // Changed to false for real data
       customFolders: []
     };
     
