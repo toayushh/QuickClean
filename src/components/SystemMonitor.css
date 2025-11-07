@@ -1,0 +1,228 @@
+.system-monitor {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 320px;
+  background: var(--bg-tertiary);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  z-index: 1000;
+  overflow: hidden;
+  cursor: move;
+  transition: all 0.3s ease;
+}
+
+.dark .system-monitor {
+  background: rgba(45, 45, 45, 0.95);
+}
+
+.system-monitor.minimized {
+  width: 200px;
+}
+
+.monitor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(255, 59, 59, 0.1), rgba(255, 107, 107, 0.08));
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  cursor: move;
+}
+
+.monitor-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ff3b3b;
+  letter-spacing: -0.2px;
+}
+
+.monitor-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.monitor-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-secondary);
+}
+
+.dark .monitor-btn {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.monitor-btn:hover {
+  background: rgba(255, 59, 59, 0.1);
+  color: var(--accent-primary);
+}
+
+.monitor-content {
+  overflow: hidden;
+}
+
+.monitor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 20px;
+}
+
+.monitor-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-tertiary);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.dark .monitor-item {
+  background: rgba(45, 45, 45, 0.6);
+}
+
+.monitor-item:hover {
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.monitor-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.monitor-icon.cpu {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+}
+
+.monitor-icon.ram {
+  background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+}
+
+.monitor-icon.disk {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+}
+
+.monitor-icon.temp {
+  background: linear-gradient(135deg, #f44336, #d32f2f);
+}
+
+.monitor-gauge {
+  width: 80px;
+  height: 80px;
+}
+
+.monitor-gauge .CircularProgressbar-text {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.monitor-gauge .CircularProgressbar-path {
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.monitor-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: color 0.3s ease;
+}
+
+.monitor-detail {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-transform: none;
+  letter-spacing: 0;
+  transition: color 0.3s ease;
+}
+
+.monitor-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  transition: all 0.3s ease;
+}
+
+.dark .monitor-footer {
+  background: rgba(45, 45, 45, 0.5);
+}
+
+.monitor-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4caf50;
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .system-monitor {
+    width: 280px;
+  }
+
+  .monitor-grid {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .monitor-gauge {
+    width: 70px;
+    height: 70px;
+  }
+}

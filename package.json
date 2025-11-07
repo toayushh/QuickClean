@@ -1,0 +1,60 @@
+{
+  "name": "quickclean",
+  "version": "1.0.0",
+  "description": "Professional PC Cleaner with Electron + React",
+  "main": "src/electron/main.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "build": "react-scripts build && electron-builder",
+    "build:win": "react-scripts build && electron-builder --win --x64",
+    "build:mac": "react-scripts build && electron-builder --mac",
+    "build:all": "react-scripts build && electron-builder --win --mac --linux",
+    "electron": "electron ."
+  },
+  "build": {
+    "appId": "com.quickclean.app",
+    "productName": "QuickClean",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "react-router-dom": "^6.20.1",
+    "react-icons": "^5.3.0",
+    "fs-extra": "^11.1.1",
+    "framer-motion": "^10.16.4",
+    "lucide-react": "^0.292.0",
+    "react-hot-toast": "^2.4.1",
+    "clsx": "^2.0.0",
+    "react-circular-progressbar": "^2.1.0",
+    "systeminformation": "^5.22.8",
+    "sudo-prompt": "^9.2.1",
+    "canvas-confetti": "^1.9.2",
+    "recharts": "^2.10.3"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.5",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4",
+    "concurrently": "^8.2.1",
+    "wait-on": "^7.0.1"
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+  }
+}

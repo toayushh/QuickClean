@@ -1,0 +1,411 @@
+.disk-analyzer-page {
+  padding: 2rem;
+}
+
+/* Selection Panel */
+.disk-analyzer-selection {
+  padding: 1.5rem;
+}
+
+.selection-section {
+  margin-bottom: 2rem;
+}
+
+.selection-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+/* Drives Grid */
+.drives-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.drive-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.drive-card:hover {
+  background: var(--bg-primary);
+  border-color: rgba(255, 59, 59, 0.3);
+}
+
+.drive-card.selected {
+  background: rgba(255, 59, 59, 0.15);
+  border-color: #ff3b3b;
+}
+
+.drive-card svg {
+  color: #ff3b3b;
+  flex-shrink: 0;
+}
+
+.drive-info {
+  flex: 1;
+  text-align: left;
+}
+
+.drive-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.drive-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Folders Grid */
+.folders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.folder-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.folder-card:hover {
+  background: var(--bg-primary);
+  border-color: rgba(255, 59, 59, 0.3);
+  transform: translateY(-2px);
+}
+
+.folder-card.selected {
+  background: rgba(255, 59, 59, 0.15);
+  border-color: #ff3b3b;
+}
+
+.folder-icon {
+  font-size: 2rem;
+}
+
+.folder-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* Selected Path */
+.selected-path {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: 'Courier New', monospace;
+}
+
+.selected-path svg {
+  color: #ff3b3b;
+  flex-shrink: 0;
+}
+
+/* Progress Display */
+.progress-info {
+  padding: 1.5rem;
+}
+
+.progress-stats {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.progress-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.progress-stat svg {
+  color: #ff3b3b;
+}
+
+.progress-path {
+  padding: 0.75rem;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* View Tabs */
+.view-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.view-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-tab:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.view-tab.active {
+  background: rgba(255, 59, 59, 0.15);
+  color: #ff3b3b;
+}
+
+/* Categories View */
+.categories-view {
+  padding: 1.5rem;
+}
+
+.category-item {
+  margin-bottom: 1.5rem;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.category-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.category-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.category-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.category-count {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.category-size {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: right;
+}
+
+.category-percentage {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ff3b3b;
+}
+
+.category-bytes {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.category-bar {
+  height: 8px;
+  background: var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.category-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+
+/* Files View */
+.files-view,
+.folders-view {
+  padding: 1.5rem;
+}
+
+.files-list,
+.folders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.file-item,
+.folder-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.file-item:hover,
+.folder-item:hover {
+  background: var(--bg-primary);
+  border-color: rgba(255, 59, 59, 0.3);
+}
+
+.file-icon,
+.folder-icon {
+  color: #ff3b3b;
+  flex-shrink: 0;
+}
+
+.file-info,
+.folder-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name,
+.folder-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-path,
+.folder-path {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-details,
+.folder-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.file-category {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 59, 59, 0.15);
+  color: #ff3b3b;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.file-size,
+.folder-size {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.folder-stats {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .disk-analyzer-page {
+    padding: 1rem;
+  }
+
+  .drives-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .folders-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .category-size {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .file-item,
+  .folder-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .file-details,
+  .folder-details {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+/* Light Mode Specific Overrides */
+/* Most styling now uses CSS variables which automatically adapt to theme */
+/* Only need specific overrides for elements that don't use variables */
