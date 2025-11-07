@@ -4,7 +4,10 @@ const si = require('systeminformation');
 // Get CPU usage percentage using systeminformation
 async function getCPUUsage() {
   try {
-    const cpu = await si.currentLoad();
+    const cpu = await Promise.race([
+      si.currentLoad(),
+      new Promise((resolve) => setTimeout(() => resolve({ currentLoad: 50 }), 3000))
+    ]);
     return Math.round(cpu.currentLoad);
   } catch (error) {
     // Fallback to basic calculation
@@ -30,7 +33,13 @@ async function getCPUUsage() {
 // Get RAM usage percentage using systeminformation
 async function getRAMUsage() {
   try {
-    const mem = await si.mem();
+    const mem = await Promise.race([
+      si.mem(),
+      new Promise((resolve) => setTimeout(() => resolve({
+        total: 16 * 1024 * 1024 * 1024,
+        active: 10 * 1024 * 1024 * 1024
+      }), 3000))
+    ]);
     const usage = (mem.active / mem.total) * 100;
 
     return {
@@ -58,7 +67,10 @@ async function getRAMUsage() {
 // Get Disk usage using systeminformation
 async function getDiskUsage() {
   try {
-    const disk = await si.fsSize();
+    const disk = await Promise.race([
+      si.fsSize(),
+      new Promise((resolve) => setTimeout(() => resolve([]), 3000))
+    ]);
     // Get primary disk (usually C: on Windows)
     const primaryDisk = disk.find(d => d.mount === 'C:') || disk[0];
     
@@ -86,7 +98,10 @@ async function getDiskUsage() {
 // Get temperature using systeminformation
 async function getTemperature() {
   try {
-    const temp = await si.cpuTemperature();
+    const temp = await Promise.race([
+      si.cpuTemperature(),
+      new Promise((resolve) => setTimeout(() => resolve({ main: 0 }), 2000))
+    ]);
     if (temp.main && temp.main > 0) {
       return Math.round(temp.main);
     }

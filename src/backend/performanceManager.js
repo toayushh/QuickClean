@@ -25,7 +25,11 @@ async function getProcessList() {
   };
 
   try {
-    const data = await si.processes();
+    // Add timeout to prevent hanging
+    const data = await Promise.race([
+      si.processes(),
+      new Promise((resolve) => setTimeout(() => resolve({ list: [] }), 5000))
+    ]);
     
     // Filter and sort processes
     const filtered = data.list

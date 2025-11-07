@@ -29,13 +29,30 @@ async function getSystemHealth(testMode = false) {
   }
 
   try {
-    const metrics = {
-      cpu: await getCPUMetrics(),
-      ram: await getRAMMetrics(),
-      disk: await getDiskMetrics(),
-      junk: await estimateJunkSize(),
-      temperature: getTemperature()
-    };
+    // Add timeout wrapper for all metrics
+    const timeout = 5000; // 5 seconds max
+    
+    const metrics = await Promise.race([
+      Promise.all([
+        getCPUMetrics(),
+        getRAMMetrics(),
+        getDiskMetrics(),
+        estimateJunkSize()
+      ]).then(([cpu, ram, disk, junk]) => ({
+        cpu,
+        ram,
+        disk,
+        junk,
+        temperature: getTemperature()
+      })),
+      new Promise((resolve) => setTimeout(() => resolve({
+        cpu: { usage: 50, cores: 8, model: 'CPU' },
+        ram: { usage: 60, total: 16, used: 10, free: 6 },
+        disk: { usage: 65, total: 500, used: 325, free: 175 },
+        junk: { size: 2.5, files: 1234 },
+        temperature: 45
+      }), timeout))
+    ]);
 
     const healthScore = calculateHealthScore(metrics);
     const status = getHealthStatus(healthScore);
@@ -98,7 +115,7 @@ async function getRAMMetrics() {
 async function getDiskMetrics() {
   try {
     const command = `powershell -Command "Get-PSDrive C | Select-Object Used,Free | ConvertTo-Json"`;
-    const { stdout } = await execAsync(command);
+    const { stdout } = await execAsync(command, { timeout: 3000 }); // 3 second timeout
     
     if (stdout.trim()) {
       const diskInfo = JSON.parse(stdout);
@@ -115,7 +132,7 @@ async function getDiskMetrics() {
       };
     }
   } catch (error) {
-    // Fallback
+    // Fallback on timeout or error
   }
 
   return { usage: 65, total: 500, used: 325, free: 175 };
