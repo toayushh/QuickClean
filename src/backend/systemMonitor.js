@@ -1,16 +1,12 @@
 const os = require('os');
-const si = require('systeminformation');
+const { exec } = require('child_process');
+const { promisify } = require('util');
 
-// Get CPU usage percentage using systeminformation
+const execAsync = promisify(exec);
+
+// Get CPU usage percentage using native Node.js
 async function getCPUUsage() {
   try {
-    const cpu = await Promise.race([
-      si.currentLoad(),
-      new Promise((resolve) => setTimeout(() => resolve({ currentLoad: 50 }), 3000))
-    ]);
-    return Math.round(cpu.currentLoad);
-  } catch (error) {
-    // Fallback to basic calculation
     const cpus = os.cpus();
     let totalIdle = 0;
     let totalTick = 0;
@@ -27,29 +23,14 @@ async function getCPUUsage() {
     const usage = 100 - ~~(100 * idle / total);
 
     return Math.min(100, Math.max(0, usage));
+  } catch (error) {
+    return 50; // Default fallback
   }
 }
 
-// Get RAM usage percentage using systeminformation
+// Get RAM usage percentage using native Node.js
 async function getRAMUsage() {
   try {
-    const mem = await Promise.race([
-      si.mem(),
-      new Promise((resolve) => setTimeout(() => resolve({
-        total: 16 * 1024 * 1024 * 1024,
-        active: 10 * 1024 * 1024 * 1024
-      }), 3000))
-    ]);
-    const usage = (mem.active / mem.total) * 100;
-
-    return {
-      usage: Math.round(usage),
-      total: Math.round(mem.total / (1024 * 1024 * 1024)), // GB
-      used: Math.round(mem.active / (1024 * 1024 * 1024)), // GB
-      free: Math.round((mem.total - mem.active) / (1024 * 1024 * 1024)) // GB
-    };
-  } catch (error) {
-    // Fallback to os module
     const totalMem = os.totalmem();
     const freeMem = os.freemem();
     const usedMem = totalMem - freeMem;
@@ -61,32 +42,51 @@ async function getRAMUsage() {
       used: Math.round(usedMem / (1024 * 1024 * 1024)), // GB
       free: Math.round(freeMem / (1024 * 1024 * 1024)) // GB
     };
+  } catch (error) {
+    return {
+      usage: 60,
+      total: 16,
+      used: 10,
+      free: 6
+    };
   }
 }
 
-// Get Disk usage using systeminformation
+// Get Disk usage using Windows command
 async function getDiskUsage() {
   try {
-    const disk = await Promise.race([
-      si.fsSize(),
-      new Promise((resolve) => setTimeout(() => resolve([]), 3000))
-    ]);
-    // Get primary disk (usually C: on Windows)
-    const primaryDisk = disk.find(d => d.mount === 'C:') || disk[0];
-    
-    if (primaryDisk) {
-      return {
-        usage: Math.round(primaryDisk.use),
-        total: Math.round(primaryDisk.size / (1024 * 1024 * 1024)), // GB
-        used: Math.round(primaryDisk.used / (1024 * 1024 * 1024)), // GB
-        free: Math.round(primaryDisk.available / (1024 * 1024 * 1024)) // GB
-      };
+    if (os.platform() === 'win32') {
+      const { stdout } = await execAsync('wmic logicaldisk where "DeviceID=\'C:\'" get Size,FreeSpace /format:list', { timeout: 3000 });
+      
+      const lines = stdout.split('\n').filter(line => line.trim());
+      let freeSpace = 0;
+      let totalSpace = 0;
+      
+      lines.forEach(line => {
+        if (line.startsWith('FreeSpace=')) {
+          freeSpace = parseInt(line.split('=')[1]);
+        } else if (line.startsWith('Size=')) {
+          totalSpace = parseInt(line.split('=')[1]);
+        }
+      });
+      
+      if (totalSpace > 0) {
+        const used = totalSpace - freeSpace;
+        const usage = (used / totalSpace) * 100;
+        
+        return {
+          usage: Math.round(usage),
+          total: Math.round(totalSpace / (1024 * 1024 * 1024)),
+          used: Math.round(used / (1024 * 1024 * 1024)),
+          free: Math.round(freeSpace / (1024 * 1024 * 1024))
+        };
+      }
     }
   } catch (error) {
-    console.error('Error getting disk usage:', error);
+    // Fallback on error
   }
 
-  // Fallback to simulated data
+  // Fallback to default data
   return {
     usage: 65,
     total: 500,
@@ -95,21 +95,8 @@ async function getDiskUsage() {
   };
 }
 
-// Get temperature using systeminformation
+// Get temperature (simulated - safe for all systems)
 async function getTemperature() {
-  try {
-    const temp = await Promise.race([
-      si.cpuTemperature(),
-      new Promise((resolve) => setTimeout(() => resolve({ main: 0 }), 2000))
-    ]);
-    if (temp.main && temp.main > 0) {
-      return Math.round(temp.main);
-    }
-  } catch (error) {
-    // Temperature sensors may not be available
-  }
-
-  // Simulate temperature based on CPU usage
   try {
     const cpuUsage = await getCPUUsage();
     const baseTemp = 35; // Base temperature

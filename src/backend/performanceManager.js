@@ -1,11 +1,11 @@
 const { exec } = require('child_process');
 const { promisify } = require('util');
-const si = require('systeminformation');
 const os = require('os');
 
 const execAsync = promisify(exec);
 
-// Detect if running on macOS
+// Detect platform
+const IS_WINDOWS = os.platform() === 'win32';
 const IS_MACOS = os.platform() === 'darwin';
 
 // Safe process list - these should never be killed
@@ -25,35 +25,50 @@ async function getProcessList() {
   };
 
   try {
-    // Add timeout to prevent hanging
-    const data = await Promise.race([
-      si.processes(),
-      new Promise((resolve) => setTimeout(() => resolve({ list: [] }), 5000))
-    ]);
-    
-    // Filter and sort processes
-    const filtered = data.list
-      .filter(p => {
-        // Filter out system processes and current app
-        const name = p.name.toLowerCase();
-        const isProtected = PROTECTED_PROCESSES.some(proc => name.includes(proc.toLowerCase()));
-        const hasUsage = p.mem > 0.1 || p.cpu > 0.1; // Show processes using any resources
-        return !isProtected && hasUsage && p.pid > 0;
-      })
-      .sort((a, b) => b.mem - a.mem) // Sort by memory usage
-      .slice(0, 30); // Top 30 processes
-
-    result.processes = filtered.map(p => ({
-      pid: p.pid,
-      name: p.name,
-      cpu: parseFloat(p.cpu || 0).toFixed(1),
-      mem: parseFloat(p.mem || 0).toFixed(1),
-      memMB: Math.round((p.memRss || p.mem * os.totalmem() / 100) / 1024 / 1024), // Convert to MB
-      command: p.command || p.name,
-      state: p.state || 'running'
-    }));
-
-    result.totalProcesses = result.processes.length;
+    if (IS_WINDOWS) {
+      // Use Windows tasklist command (much faster than systeminformation)
+      const { stdout } = await execAsync('tasklist /FO CSV /NH', { timeout: 3000 });
+      
+      const lines = stdout.split('\n').filter(line => line.trim());
+      const processes = [];
+      
+      for (const line of lines.slice(0, 30)) { // Top 30
+        const parts = line.split('","').map(p => p.replace(/"/g, ''));
+        if (parts.length >= 5) {
+          const name = parts[0];
+          const pid = parseInt(parts[1]);
+          const memStr = parts[4].replace(/[^0-9]/g, '');
+          const memKB = parseInt(memStr) || 0;
+          
+          // Filter out protected processes
+          const isProtected = PROTECTED_PROCESSES.some(proc => 
+            name.toLowerCase().includes(proc.toLowerCase())
+          );
+          
+          if (!isProtected && pid > 0 && memKB > 1000) { // Only show processes using > 1MB
+            processes.push({
+              pid,
+              name,
+              cpu: '0.0', // Windows tasklist doesn't show CPU easily
+              mem: '0.0',
+              memMB: Math.round(memKB / 1024),
+              command: name,
+              state: 'running'
+            });
+          }
+        }
+      }
+      
+      // Sort by memory
+      processes.sort((a, b) => b.memMB - a.memMB);
+      
+      result.processes = processes.slice(0, 30);
+      result.totalProcesses = result.processes.length;
+    } else {
+      // Fallback for non-Windows
+      result.processes = [];
+      result.totalProcesses = 0;
+    }
   } catch (error) {
     console.error('Error getting processes:', error);
     result.success = false;
@@ -78,23 +93,9 @@ async function endProcess(pid) {
   }
 
   try {
-    // Double-check it's not a protected process
-    const processes = await si.processes();
-    const targetProcess = processes.list.find(p => p.pid === pid);
-    
-    if (targetProcess) {
-      const name = targetProcess.name.toLowerCase();
-      const isProtected = PROTECTED_PROCESSES.some(proc => name.includes(proc.toLowerCase()));
-      
-      if (isProtected) {
-        result.message = `Cannot terminate protected system process: ${targetProcess.name}`;
-        return result;
-      }
-    }
-
     // Kill the process using platform-specific command
-    const command = IS_MACOS ? `kill -9 ${pid}` : `taskkill /PID ${pid} /F`;
-    await execAsync(command, { timeout: 5000 });
+    const command = IS_WINDOWS ? `taskkill /PID ${pid} /F` : IS_MACOS ? `kill -9 ${pid}` : `kill -9 ${pid}`;
+    await execAsync(command, { timeout: 3000 });
     
     result.success = true;
     result.message = `Process ${pid} terminated successfully`;
